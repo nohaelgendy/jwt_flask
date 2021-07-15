@@ -11,13 +11,22 @@ app.config['SECRET_KEY'] = 'ce4551f3b39648f09badedd1beb7dbcf'
 def token_required(func):
     @wraps(func)
     def decorated(*args, **kwargs):
-        token = request.args.get('token')
+        # token = request.args.get('token')
+
+        # Modification # 1 (Access the token from the header request)
+        if 'token' in request.headers:  
+          token = request.headers['token']
+
         if not token:
             return jsonify({'Alert!': 'Token is missing!'})
         try:
             payload = jwt.decode(token, app.config['SECRET_KEY'])
         except:
             return jsonify({'Alert!': 'Invalid Token!'})
+
+        # Modification # 2 
+        return func( *args,  **kwargs)
+
     return decorated
 
 
